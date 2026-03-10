@@ -16,7 +16,7 @@ From TLC Require Export LibOperation.
 
 (* --TODO: what would be a better name for [binary]? *)
 
-Definition binary (A : Type) := A -> A -> Prop.
+Notation binary A := (A -> A -> Prop).
 
 
 (* ---------------------------------------------------------------------- *)

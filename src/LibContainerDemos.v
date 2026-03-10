@@ -104,7 +104,7 @@ Module Internal.
 (** Finite maps are implemented using the typeclasses defined in
     LibContainer. The internal implementation is: *)
 
-Definition map (A B : Type) := A -> option B.
+Notation map := LibMap.map.
 
 (** The internal definition of [read] in a map is thus a function
     that applies the map to the index. When the result is [None]

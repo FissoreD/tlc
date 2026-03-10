@@ -22,6 +22,10 @@ Open Scope nat_scope.
 (** ** Basic definitions *)
 
 Definition multiset (A : Type) := A -> nat.
+Elpi Accumulate TC.Solver lp:{{
+  tc-TLC.LibEqual.tc-Extensionality {{multiset lp:A}} R :-
+    tc-TLC.LibEqual.tc-Extensionality {{lp:A -> Type}} R.
+}}.
 
 Section Operations.
 Variables (A B : Type).
@@ -63,9 +67,10 @@ Definition card_impl A (E:multiset A) :=
 Lemma in_inst : forall A, BagIn A (multiset A).
 Proof using. constructor. exact (@in_impl A). Defined.
 
-#[global]
+(* #[global]
 Hint Extern 1 (BagIn _ (multiset _)) => apply in_inst
-  : typeclass_instances.
+  : typeclass_instances. *)
+#[global] Existing Instance in_inst.
 
 #[global]
 Instance empty_inst : forall A, BagEmpty (multiset A).

@@ -1,0 +1,140 @@
+diff --git a/src/LibContainerDemos.v b/src/LibContainerDemos.v
+index 224613e..a10635f 100644
+--- a/src/LibContainerDemos.v
++++ b/src/LibContainerDemos.v
+@@ -104,7 +104,7 @@ Module Internal.
+ (** Finite maps are implemented using the typeclasses defined in
+     LibContainer. The internal implementation is: *)
+ 
+-Definition map (A B : Type) := A -> option B.
++Notation map := LibMap.map.
+ 
+ (** The internal definition of [read] in a map is thus a function
+     that applies the map to the index. When the result is [None]
+diff --git a/src/LibEqual.v b/src/LibEqual.v
+index 7c4d331..36a80ab 100644
+--- a/src/LibEqual.v
++++ b/src/LibEqual.v
+@@ -7,6 +7,8 @@ Set Implicit Arguments.
+ From TLC Require Import LibTactics LibAxioms.
+ Generalizable Variables A.
+ 
++From elpi.apps Require Export tc.
++Elpi TC Solver Override TC.Solver All.
+ 
+ (* ********************************************************************** *)
+ (** * Definition of equality *)
+@@ -863,7 +865,7 @@ Proof using. introv E. dependent rewrite E. simple~. constructor. Qed.
+ (* ********************************************************************** *)
+ (** * John Major's equality *)
+ 
+-From Coq.Logic Require Import JMeq.
++From Stdlib.Logic Require Import JMeq.
+ 
+ (** The module above defines John Major's equality:
+ 
+@@ -910,4 +912,3 @@ Proof using.
+   introv E. apply (@eq_dep_same_inv Type (fun T => T)).
+   apply~ eq_dep_of_JMeq.
+ Qed.
+-
+diff --git a/src/LibList.v b/src/LibList.v
+index 45c511b..e200dd4 100644
+--- a/src/LibList.v
++++ b/src/LibList.v
+@@ -13,6 +13,11 @@ Local Open Scope nat_scope.
+ Local Open Scope comp_scope.
+ Global Close Scope list_scope.
+ 
++Elpi TC.AddAllClasses.
++Elpi TC Solver Override TC.Solver All.
++Elpi TC Solver Override TC.Solver Rm Proper ProperProxy subrelation RelationClasses.Reflexive.
++
++
+ 
+ (* ********************************************************************** *)
+ (** Fixing implicit arguments *)
+diff --git a/src/LibMap.v b/src/LibMap.v
+index 2c6bf71..8bb04f9 100644
+--- a/src/LibMap.v
++++ b/src/LibMap.v
+@@ -20,6 +20,12 @@ Local Open Scope set_scope.
+ 
+ Definition map (A B : Type) := A -> option B.
+ 
++Elpi Accumulate TC.Solver lp:{{
++  tc-TLC.LibEqual.tc-Extensionality {{map lp:A lp:B}} R :-
++    tc-TLC.LibEqual.tc-Extensionality {{lp:A -> option lp:B}} R.
++}}.
++
++
+ Section Operations.
+ Variables (A B : Type).
+ Implicit Types k : A.
+diff --git a/src/LibMultiset.v b/src/LibMultiset.v
+index 52c7200..9a0a9a9 100644
+--- a/src/LibMultiset.v
++++ b/src/LibMultiset.v
+@@ -22,6 +22,10 @@ Open Scope nat_scope.
+ (** ** Basic definitions *)
+ 
+ Definition multiset (A : Type) := A -> nat.
++Elpi Accumulate TC.Solver lp:{{
++  tc-TLC.LibEqual.tc-Extensionality {{multiset lp:A}} R :-
++    tc-TLC.LibEqual.tc-Extensionality {{lp:A -> Type}} R.
++}}.
+ 
+ Section Operations.
+ Variables (A B : Type).
+@@ -63,9 +67,10 @@ Definition card_impl A (E:multiset A) :=
+ Lemma in_inst : forall A, BagIn A (multiset A).
+ Proof using. constructor. exact (@in_impl A). Defined.
+ 
+-#[global]
++(* #[global]
+ Hint Extern 1 (BagIn _ (multiset _)) => apply in_inst
+-  : typeclass_instances.
++  : typeclass_instances. *)
++#[global] Existing Instance in_inst.
+ 
+ #[global]
+ Instance empty_inst : forall A, BagEmpty (multiset A).
+diff --git a/src/LibRelation.v b/src/LibRelation.v
+index 24b790f..15be690 100644
+--- a/src/LibRelation.v
++++ b/src/LibRelation.v
+@@ -16,7 +16,7 @@ From TLC Require Export LibOperation.
+ 
+ (* --TODO: what would be a better name for [binary]? *)
+ 
+-Definition binary (A : Type) := A -> A -> Prop.
++Notation binary A := (A -> A -> Prop).
+ 
+ 
+ (* ---------------------------------------------------------------------- *)
+diff --git a/src/LibSet.v b/src/LibSet.v
+index fd9daa2..3cb49b2 100644
+--- a/src/LibSet.v
++++ b/src/LibSet.v
+@@ -108,7 +108,8 @@ Lemma in_inst : forall A, BagIn A (set A).
+ Proof using. constructor. exact (@in_impl A). Defined.
+ 
+ #[global]
+-Hint Extern 1 (BagIn _ (set _)) => apply in_inst : typeclass_instances.
++(* Hint Extern 1 (BagIn _ (set _)) => apply in_inst : typeclass_instances. *)
++Existing Instance  in_inst.
+ (* -- LATER: could this be an instance like all others ? *)
+ 
+ #[global]
+@@ -237,6 +238,11 @@ Lemma in_set_st_eq : forall (P:A->Prop) x,
+   x \in set_st P = P x.
+ Proof using. intros. apply* prop_ext. Qed.
+ 
++Elpi Accumulate TC.Solver lp:{{
++  tc-TLC.LibEqual.tc-Extensionality {{set lp:A}} R :-
++    tc-TLC.LibEqual.tc-Extensionality {{lp:A -> Prop}} R.
++}}.
++
+ Lemma set_ext_eq : forall E F,
+   (E = F) = (forall (x:A), x \in E <-> x \in F).
+ Proof using.

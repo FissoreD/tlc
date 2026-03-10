@@ -20,6 +20,12 @@ Local Open Scope set_scope.
 
 Definition map (A B : Type) := A -> option B.
 
+Elpi Accumulate TC.Solver lp:{{
+  tc-TLC.LibEqual.tc-Extensionality {{map lp:A lp:B}} R :-
+    tc-TLC.LibEqual.tc-Extensionality {{lp:A -> option lp:B}} R.
+}}.
+
+
 Section Operations.
 Variables (A B : Type).
 Implicit Types k : A.

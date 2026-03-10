@@ -7,6 +7,8 @@ Set Implicit Arguments.
 From TLC Require Import LibTactics LibAxioms.
 Generalizable Variables A.
 
+From elpi.apps Require Export tc.
+Elpi TC Solver Override TC.Solver All.
 
 (* ********************************************************************** *)
 (** * Definition of equality *)
@@ -863,7 +865,7 @@ Proof using. introv E. dependent rewrite E. simple~. constructor. Qed.
 (* ********************************************************************** *)
 (** * John Major's equality *)
 
-From Coq.Logic Require Import JMeq.
+From Stdlib.Logic Require Import JMeq.
 
 (** The module above defines John Major's equality:
 
@@ -910,4 +912,3 @@ Proof using.
   introv E. apply (@eq_dep_same_inv Type (fun T => T)).
   apply~ eq_dep_of_JMeq.
 Qed.
-

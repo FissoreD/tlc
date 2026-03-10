@@ -13,6 +13,11 @@ Local Open Scope nat_scope.
 Local Open Scope comp_scope.
 Global Close Scope list_scope.
 
+Elpi TC.AddAllClasses.
+Elpi TC Solver Override TC.Solver All.
+Elpi TC Solver Override TC.Solver Rm Proper ProperProxy subrelation RelationClasses.Reflexive.
+
+
 
 (* ********************************************************************** *)
 (** Fixing implicit arguments *)
